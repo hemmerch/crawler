@@ -25,8 +25,6 @@ namespace AOE\Crawler\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Core\Controller\CommandLineController;
-
 /**
  * Class FlushCommandLineController
  *

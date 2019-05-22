@@ -41,7 +41,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Log\LogLevel;
-use TYPO3\CMS\Core\TimeTracker\NullTimeTracker;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -404,7 +403,7 @@ class CrawlerController
     protected function noUnprocessedQueueEntriesForPageWithConfigurationHashExist($uid, $configurationHash)
     {
         return $this->queryBuilder
-            ->count()
+            ->select('*')
             ->from($this->tableName)
             ->where(
                 $this->queryBuilder->expr()->eq('page_id', intval($uid)),
@@ -659,7 +658,7 @@ class CrawlerController
         $rootLine = BackendUtility::BEgetRootLine($id);
 
         foreach ($rootLine as $page) {
-            $configurationRecordsForCurrentPage = BackendUtility::getRecordsByField(
+            $configurationRecordsForCurrentPage = \AOE\Crawler\Utility\BackendUtility::getRecordsByField(
                 'tx_crawler_configuration',
                 'pid',
                 intval($page['uid']),
@@ -2100,6 +2099,7 @@ class CrawlerController
     {
         $this->setAccessMode('cli_im');
 
+        /** @var \AOE\Crawler\Command\QueueCommandLineController $cliObj */
         $cliObj = GeneralUtility::makeInstance(QueueCommandLineController::class);
 
         // Force user to admin state and set workspace to "Live":
@@ -2665,10 +2665,6 @@ class CrawlerController
     protected function initTSFE($id = 1, $typeNum = 0)
     {
         EidUtility::initTCA();
-        if (!is_object($GLOBALS['TT'])) {
-            $GLOBALS['TT'] = new NullTimeTracker();
-            $GLOBALS['TT']->start();
-        }
 
         $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $id, $typeNum);
         $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
@@ -2679,7 +2675,6 @@ class CrawlerController
         $GLOBALS['TSFE']->initTemplate();
         $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($id, '');
         $GLOBALS['TSFE']->getConfigArray();
-        PageGenerator::pagegenInit();
     }
 
     /**

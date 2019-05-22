@@ -32,7 +32,6 @@ use AOE\Crawler\Event\EventDispatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Class CrawlerCommandController
